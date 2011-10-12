@@ -30,16 +30,16 @@ static const int pControllHeight = 30;
 static const int maxPageCount = 6;
 
 /* iPhone */
-static const int maxItemsPageCount = 9;
+static const int maxItemsPageCount = 16;
 
-static const int portraitItemWidth = 106;
-static const int portraitItemHeight = 106;
-static const int portraitColumnCount = 3;
-static const int portraitRowCount = 3;
-static const CGFloat portraitItemXStart = 0;
-static const CGFloat portraitItemYStart = 0;
-static const CGFloat portraitXPadding = 0;
-static const CGFloat portraitYPadding = 0;
+static const int portraitItemWidth = 74;
+static const int portraitItemHeight = 74;
+static const int portraitColumnCount = 4;
+static const int portraitRowCount = 4;
+static const CGFloat portraitItemXStart = 10.0f;
+static const CGFloat portraitItemYStart = 10.f;
+static const CGFloat portraitXPadding = 1.0f;
+static const CGFloat portraitYPadding = 1.0f;
 
 static const int landscapeItemWidth = 96;
 static const int landscapeItemHeight = 96;
