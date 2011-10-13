@@ -849,5 +849,12 @@ static const CGFloat iPadLandscapeYPadding = 30;
     }
 }
 
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+    if (self.itemHoldTimer) {
+        [self.itemHoldTimer invalidate];
+        self.itemHoldTimer = nil;
+    }
+}
 
 @end
