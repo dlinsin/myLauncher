@@ -97,6 +97,8 @@ static const CGFloat iPadLandscapeYPadding = 30;
 @synthesize itemHoldTimer = _itemHoldTimer;
 @synthesize movePagesTimer = _movePagesTimer;
 @synthesize draggingItem = _draggingItem;
+@synthesize configDelegate;
+
 
 #pragma mark - View lifecycle
 
@@ -443,7 +445,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 	}
 	else if (editingAllowed)
 	{
-		[self.itemHoldTimer invalidate];
+        [self.itemHoldTimer invalidate];
 		self.itemHoldTimer = nil;
         
 		self.itemHoldTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(itemHoldTimer:) userInfo:item repeats:NO];
@@ -820,5 +822,32 @@ static const CGFloat iPadLandscapeYPadding = 30;
 		[standardUserDefaults synchronize];
 	}
 }
+
+#pragma mark --
+#pragma mark -- Custom Changes dealing with detecting a long press on a none item space
+
+- (void)itemHoldTimerConfig {
+    self.itemHoldTimer = nil;
+    [self.configDelegate startConfig];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+    if (!self.itemHoldTimer && !editing) {
+        [self.itemHoldTimer invalidate];
+        self.itemHoldTimer = nil;
+
+        self.itemHoldTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(itemHoldTimerConfig) userInfo:nil repeats:NO];
+    }
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
+    if (self.itemHoldTimer) {
+        [self.itemHoldTimer invalidate];
+        self.itemHoldTimer = nil;
+    }
+}
+
 
 @end

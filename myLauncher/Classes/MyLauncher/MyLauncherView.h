@@ -29,6 +29,10 @@
 -(void)launcherViewDidEndEditing:(id)sender;
 @end
 
+@protocol MyLauncherConfigDelegate <NSObject>
+- (void)startConfig;
+@end
+
 @interface MyLauncherView : UIView <UIScrollViewDelegate, MyLauncherItemDelegate> {	
     UIDeviceOrientation currentOrientation;
 	BOOL itemsAdded;
@@ -49,10 +53,11 @@
 
 @property (nonatomic) BOOL editingAllowed;
 @property (nonatomic) NSInteger numberOfImmovableItems;
-@property (nonatomic, strong) id <MyLauncherViewDelegate> delegate;
+@property (nonatomic, assign) id <MyLauncherViewDelegate> delegate;
 @property (nonatomic, strong) MyLauncherScrollView *pagesScrollView;
 @property (nonatomic, strong) MyLauncherPageControl *pageControl;
 @property (nonatomic, strong) NSMutableArray *pages;
+@property (nonatomic, assign) id<MyLauncherConfigDelegate> configDelegate;
 
 // Default for animation below is YES
 
