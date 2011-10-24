@@ -226,7 +226,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 #pragma mark - Layout Settings
 
 -(int)maxItemsPerPage {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPad"]) {
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         return iPadMaxItemsPageCount;
     }
     return maxItemsPageCount;
@@ -237,7 +237,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 }
 
 -(void)setupCurrentViewLayoutSettings {    
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPad"]) {
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if (UIDeviceOrientationIsLandscape([self currentLayoutOrientation])) {
             minX = iPadLandscapeItemXStart;
             minY = iPadLandscapeItemYStart;
@@ -363,7 +363,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 	int currentPageIndex = 0;
 	for(NSMutableArray *page in self.pages)
 	{
-        int imaxItemsPageCount = [[UIDevice currentDevice].model hasPrefix:@"iPad"] ? iPadMaxItemsPageCount : maxItemsPageCount;
+        int imaxItemsPageCount = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? iPadMaxItemsPageCount : maxItemsPageCount;
 		if(page.count > imaxItemsPageCount)
 		{
 			NSInteger nextPageIndex = currentPageIndex+1;
