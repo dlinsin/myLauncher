@@ -43,6 +43,9 @@
 -(id)initWithTitle:(NSString *)title image:(NSString *)image target:(NSString *)targetControllerStr deletable:(BOOL)_deletable;
 -(id)initWithTitle:(NSString *)title iPhoneImage:(NSString *)image iPadImage:(NSString *)iPadImage target:(NSString *)targetControllerStr targetTitle:(NSString *)targetTitle deletable:(BOOL)_deletable;
 -(void)layoutItem;
+
+- (void)closeItem:(id)sender;
+
 -(void)setDragging:(BOOL)flag;
 -(BOOL)dragging;
 -(BOOL)deletable;
