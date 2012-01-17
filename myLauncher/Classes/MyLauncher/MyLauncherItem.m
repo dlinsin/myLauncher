@@ -31,6 +31,8 @@
 @synthesize controllerStr = _controllerStr;
 @synthesize controllerTitle = _controllerTitle;
 @synthesize badge = _badge;
+@synthesize page = _page;
+@synthesize index = _index;
 
 #pragma mark - Lifecycle
 

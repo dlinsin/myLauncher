@@ -30,7 +30,7 @@
 @end
 
 @protocol MyLauncherConfigDelegate <NSObject>
-- (void)startConfig;
+- (void)startConfigOnPage:(NSNumber *)pageNumber;
 @end
 
 @interface MyLauncherView : UIView <UIScrollViewDelegate, MyLauncherItemDelegate> {	

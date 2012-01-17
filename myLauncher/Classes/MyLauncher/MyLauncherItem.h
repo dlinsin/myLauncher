@@ -39,6 +39,8 @@
 @property (nonatomic, retain) NSString *controllerTitle;
 @property (nonatomic, retain) UIButton *closeButton;
 @property (nonatomic, retain) CustomBadge *badge;
+@property (nonatomic, retain) NSNumber *page;
+@property (nonatomic, retain) NSNumber *index;
 
 -(id)initWithTitle:(NSString *)title image:(NSString *)image target:(NSString *)targetControllerStr deletable:(BOOL)_deletable;
 -(id)initWithTitle:(NSString *)title iPhoneImage:(NSString *)image iPadImage:(NSString *)iPadImage target:(NSString *)targetControllerStr targetTitle:(NSString *)targetTitle deletable:(BOOL)_deletable;

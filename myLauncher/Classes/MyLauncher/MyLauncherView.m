@@ -82,6 +82,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 -(void)savePages;
 -(void)saveToUserDefaults:(id)object key:(NSString *)key;
 -(UIDeviceOrientation)currentLayoutOrientation;
+- (NSNumber *)currentPage;
 @property (nonatomic, retain) NSTimer *itemHoldTimer;
 @property (nonatomic, retain) NSTimer *movePagesTimer;
 @property (nonatomic, retain) MyLauncherItem *draggingItem;
@@ -140,6 +141,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 
 -(void)viewDidAppear:(BOOL)animated
 {
+    NSLog(@"FINDME: did appear pages count: %d", [self.pages count]);
     [self layoutItems];
 }
 
@@ -179,6 +181,14 @@ static const CGFloat iPadLandscapeYPadding = 30;
     [self setNumberOfImmovableItems:items];
 }
 
+#pragma mark - PageInfo
+- (NSNumber *)currentPage {
+    float pageWidth = self.pagesScrollView.frame.size.width;
+    float contentOffset = self.pagesScrollView.contentOffset.x;
+    int currentPage = floor(contentOffset / pageWidth);
+    return [NSNumber numberWithInt:currentPage];
+}
+
 #pragma mark - View Orientation
 
 - (void)setCurrentOrientation:(UIInterfaceOrientation)newOrientation {
@@ -207,7 +217,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 {
 	self.pageControl.currentPage = floor((self.pagesScrollView.contentOffset.x - self.pagesScrollView.frame.size.width / 2) / 
                                          self.pagesScrollView.frame.size.width) + 1;
-	
+    
 }
 
 - (void)updateFrames
@@ -312,8 +322,11 @@ static const CGFloat iPadLandscapeYPadding = 30;
         CGFloat x = minX;
         CGFloat y = minY;
 		int itemsCount = 1;
+        int itemIndex = 0;
 		for (MyLauncherItem *item in page)
 		{
+            item.index = [NSNumber numberWithInt:itemIndex];
+            NSLog(@"FINDME: ITEM: %@ Index %d", item.title, [item.index intValue]);
 			if(itemsAdded) 
 			{
 				CGRect prevFrame = CGRectMake(x, y, itemWidth, itemHeight);
@@ -346,6 +359,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 			}
 			
 			itemsCount++;
+            itemIndex++;
 		}
 		
 		minX += pageWidth;
@@ -360,33 +374,33 @@ static const CGFloat iPadLandscapeYPadding = 30;
 
 -(void)organizePages
 {
-	int currentPageIndex = 0;
-	for(NSMutableArray *page in self.pages)
-	{
-        int imaxItemsPageCount = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? iPadMaxItemsPageCount : maxItemsPageCount;
-		if(page.count > imaxItemsPageCount)
-		{
-			NSInteger nextPageIndex = currentPageIndex+1;
-			NSMutableArray *nextPage = [self.pages objectAtIndex:nextPageIndex];
-			if(nextPage)
-			{
-				MyLauncherItem *moveItem = [page lastObject];
-				[page removeObject:moveItem];
-				[nextPage insertObject:moveItem atIndex:0];
-                moveItem = nil;
-			}
-			else
-			{
-				[self.pages addObject:[NSMutableArray array]];
-				nextPage = [self.pages lastObject];
-				MyLauncherItem *moveItem = [page lastObject];
-				[page removeObject:moveItem];
-				[nextPage addObject:moveItem];
-                moveItem = nil;
-			}
-		}
-		currentPageIndex++;
-	}	
+//	int currentPageIndex = 0;
+//	for(NSMutableArray *page in self.pages)
+//	{
+//        int imaxItemsPageCount = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? iPadMaxItemsPageCount : maxItemsPageCount;
+//		if(page.count > imaxItemsPageCount)
+//		{
+//			NSInteger nextPageIndex = currentPageIndex+1;
+//			NSMutableArray *nextPage = [self.pages objectAtIndex:nextPageIndex];
+//			if(nextPage)
+//			{
+//				MyLauncherItem *moveItem = [page lastObject];
+//				[page removeObject:moveItem];
+//				[nextPage insertObject:moveItem atIndex:0];
+//                moveItem = nil;
+//			}
+//			else
+//			{
+//				[self.pages addObject:[NSMutableArray array]];
+//				nextPage = [self.pages lastObject];
+//				MyLauncherItem *moveItem = [page lastObject];
+//				[page removeObject:moveItem];
+//				[nextPage addObject:moveItem];
+//                moveItem = nil;
+//			}
+//		}
+//		currentPageIndex++;
+//	}	
 }
 
 #pragma mark - Touch Management
@@ -483,7 +497,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
 	[super touchesMoved:touches withEvent:event];
-	
+
 	if(dragging) 
 	{
 		for (UITouch* touch in touches) 
@@ -506,6 +520,10 @@ static const CGFloat iPadLandscapeYPadding = 30;
 			NSInteger dragIndex = (dragItemRow * columnCount) + dragItemColumn;
             NSInteger currentPageIndex = floor(self.pagesScrollView.contentOffset.x/self.pagesScrollView.frame.size.width);
             
+            NSLog(@"FINDME: CURRENT PAGE INDEX: %d", currentPageIndex);
+            NSLog(@"FINDME: ITEM PAGE INDEX: %d", page);
+            
+            
 			if(sindex != dragIndex)
 			{
                 NSMutableArray *itemPage = [self.pages objectAtIndex:page];
@@ -515,24 +533,33 @@ static const CGFloat iPadLandscapeYPadding = 30;
                         [itemPage removeObjectAtIndex:sindex];
                         
                         NSMutableArray *currentPage = [self.pages objectAtIndex:currentPageIndex];
-                        if(dragIndex > currentPage.count)
+                        if(page == currentPageIndex)
                         {
-                            dragIndex = currentPage.count;
-                            [currentPage insertObject:self.draggingItem atIndex:dragIndex];
-                            [self organizePages];
-                        }
-                        else 
-                        {
+                            self.draggingItem.index = [NSNumber numberWithInt:dragIndex];
                             [currentPage insertObject:self.draggingItem atIndex:dragIndex];
                             [self organizePages];
                             [UIView animateWithDuration:0.3 
                                              animations:^{
                                                  [self layoutItems]; 
                                              }];
+                        } else if (currentPageIndex > page) {
+                            [self.pages addObject:[NSMutableArray array]];
+                            self.pageControl.numberOfPages = self.pages.count;
+                            NSMutableArray *newPage = [self.pages objectAtIndex:currentPageIndex];
+                            self.draggingItem.page = [NSNumber numberWithInt:currentPageIndex];
+                            self.draggingItem.index = [NSNumber numberWithInt:dragIndex];
+                            [newPage insertObject:self.draggingItem atIndex:dragIndex];
+                            [UIView animateWithDuration:0.3 
+                                             animations:^{
+                                                 [self layoutItems]; 
+                                             }];
+
+                            
                         }
                     }
                 }
-			}
+                
+            }
 			
 			//Moving Pages
 			if(location.x + self.pagesScrollView.contentOffset.x < self.pagesScrollView.contentOffset.x + 20)
@@ -578,8 +605,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 		{
 			if(self.pages.count <= maxPageCount)
 			{
-				[self.pages addObject:[NSMutableArray array]];
-				self.pageControl.numberOfPages = self.pages.count;
+                // Moved to TouchesMoved
 			}
 		}
 		self.pageControl.currentPage = currentPageIndex;
@@ -828,7 +854,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 
 - (void)itemHoldTimerConfig {
     self.itemHoldTimer = nil;
-    [self.configDelegate startConfig];
+    [self.configDelegate startConfigOnPage:[self currentPage]];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
