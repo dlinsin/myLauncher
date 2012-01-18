@@ -42,8 +42,8 @@
 @property (nonatomic, retain) NSNumber *page;
 @property (nonatomic, retain) NSNumber *index;
 
--(id)initWithTitle:(NSString *)title image:(NSString *)image target:(NSString *)targetControllerStr deletable:(BOOL)_deletable;
--(id)initWithTitle:(NSString *)title iPhoneImage:(NSString *)image iPadImage:(NSString *)iPadImage target:(NSString *)targetControllerStr targetTitle:(NSString *)targetTitle deletable:(BOOL)_deletable;
+-(id)initWithTitle:(NSString *)title image:(NSString *)image target:(NSString *)targetControllerStr deletable:(BOOL)_deletable page:(NSNumber *)page index:(NSNumber *)index;
+-(id)initWithTitle:(NSString *)title iPhoneImage:(NSString *)image iPadImage:(NSString *)iPadImage target:(NSString *)targetControllerStr targetTitle:(NSString *)targetTitle deletable:(BOOL)_deletable page:(NSNumber *)page index:(NSNumber *)index;
 -(void)layoutItem;
 
 - (void)closeItem:(id)sender;

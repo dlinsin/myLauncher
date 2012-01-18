@@ -226,14 +226,19 @@
                                                iPadImage:[item objectForKey:@"iPadImage"]
                                                target:[item objectForKey:@"controller"] 
                                                targetTitle:[item objectForKey:@"controllerTitle"]
-                                               deletable:[[item objectForKey:@"deletable"] boolValue]]];
+                                              deletable:[[item objectForKey:@"deletable"] boolValue] 
+                                              page:[item objectForKey:@"itemPage"] 
+                                              index:[item objectForKey:@"itemIndex"]]];
+                        NSLog(@"FINDME: After loading: %d", [[item objectForKey:@"itemPage"] intValue]);
                     }
                 } else {
                     [savedPage addObject:[[MyLauncherItem alloc]
                                            initWithTitle:[item objectForKey:@"title"]
                                            image:[item objectForKey:@"image"]
                                            target:[item objectForKey:@"controller"]
-                                           deletable:[[item objectForKey:@"deletable"] boolValue]]];
+                                           deletable:[[item objectForKey:@"deletable"] boolValue] 
+                                          page:[item objectForKey:@"itemPage"] 
+                                          index:[item objectForKey:@"itemIndex"]]];
                 }
 			}
 			

@@ -36,16 +36,18 @@
 
 #pragma mark - Lifecycle
 
--(id)initWithTitle:(NSString *)title image:(NSString *)image target:(NSString *)targetControllerStr deletable:(BOOL)_deletable {
+-(id)initWithTitle:(NSString *)title image:(NSString *)image target:(NSString *)targetControllerStr deletable:(BOOL)_deletable page:(NSNumber *)page index:(NSNumber *)index {
 	return [self initWithTitle:title 
                    iPhoneImage:image 
                      iPadImage:image 
                         target:targetControllerStr 
                    targetTitle:title 
-                     deletable:_deletable];
+                     deletable:_deletable 
+                          page:page
+                         index:index];
 }
 
--(id)initWithTitle:(NSString *)title iPhoneImage:(NSString *)image iPadImage:(NSString *)iPadImage target:(NSString *)targetControllerStr targetTitle:(NSString *)targetTitle deletable:(BOOL)_deletable {
+-(id)initWithTitle:(NSString *)title iPhoneImage:(NSString *)image iPadImage:(NSString *)iPadImage target:(NSString *)targetControllerStr targetTitle:(NSString *)targetTitle deletable:(BOOL)_deletable page:(NSNumber *)page index:(NSNumber *)index {
     
     if((self = [super init]))
 	{ 
@@ -57,6 +59,8 @@
         [self setIPadImage:iPadImage];
 		[self setControllerStr:targetControllerStr];
         [self setControllerTitle:targetTitle];
+        [self setPage:page];
+        [self setIndex:index];
 		
 		[self setCloseButton:[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 0, 0)]];
 		self.closeButton.hidden = YES;

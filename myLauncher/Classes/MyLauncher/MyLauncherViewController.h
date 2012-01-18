@@ -30,6 +30,7 @@
 @property (nonatomic, strong) NSMutableDictionary *appControllers;
 
 -(BOOL)hasSavedLauncherItems;
+-(NSMutableArray *)savedLauncherItems;
 -(void)clearSavedLauncherItems;
 
 @end
