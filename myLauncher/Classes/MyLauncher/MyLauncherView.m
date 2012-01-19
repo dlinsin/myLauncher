@@ -76,6 +76,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 -(void)layoutItems;
 -(void)beginEditing;
 -(void)animateItems;
+-(void)createNewPage;
 -(void)organizePages;
 -(NItemLocation)itemLocation;
 -(BOOL)itemMovable:(MyLauncherItem *)itemToSearch;
@@ -86,6 +87,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 @property (nonatomic, retain) NSTimer *itemHoldTimer;
 @property (nonatomic, retain) NSTimer *movePagesTimer;
 @property (nonatomic, retain) MyLauncherItem *draggingItem;
+@property (nonatomic, retain) MyLauncherItem *overFlowItem;
 @end
 
 @implementation MyLauncherView
@@ -98,6 +100,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 @synthesize itemHoldTimer = _itemHoldTimer;
 @synthesize movePagesTimer = _movePagesTimer;
 @synthesize draggingItem = _draggingItem;
+@synthesize overFlowItem = _overFlowItem;
 @synthesize configDelegate;
 
 
@@ -372,6 +375,15 @@ static const CGFloat iPadLandscapeYPadding = 30;
 	itemsAdded = YES;
 }
 
+- (void)createNewPage {
+    if(self.pages.count <= maxPageCount)
+    {
+        [self.pages addObject:[NSMutableArray array]];
+        self.pageControl.numberOfPages = self.pages.count;
+        self.pagesScrollView.contentSize = CGSizeMake(self.pages.count*self.pagesScrollView.frame.size.width, 
+                                                      self.pagesScrollView.frame.size.height);
+    }
+}
 -(void)organizePages
 {
 //	int currentPageIndex = 0;
@@ -498,11 +510,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
 {
 	[super touchesMoved:touches withEvent:event];
     
-    NItemLocation sItemLocation = [self itemLocation];
-    NSInteger page = sItemLocation.page;
-    NSInteger sindex = sItemLocation.sindex;
-
-
 	if(dragging) 
 	{
 		for (UITouch* touch in touches) 
@@ -519,11 +526,16 @@ static const CGFloat iPadLandscapeYPadding = 30;
             
 			NSInteger dragItemColumn = floor(dragItemX/distanceWidth); // item width
 			NSInteger dragItemRow = floor(dragItemY/distanceHeight); // item height
-			NSInteger dragIndex = (dragItemRow * columnCount) + dragItemColumn;
+			NSInteger dragIndex = ((dragItemRow * columnCount) + dragItemColumn > maxItemsPageCount) ? maxItemsPageCount : (dragItemRow * columnCount) + dragItemColumn;
             NSInteger currentPageIndex = floor(self.pagesScrollView.contentOffset.x/self.pagesScrollView.frame.size.width);
+            
+            NItemLocation sItemLocation = [self itemLocation];
+            NSInteger page = sItemLocation.page;
+            NSInteger sindex = sItemLocation.sindex;
             
 			if(sindex != dragIndex)
 			{
+                // moving item on the current page
                 if (currentPageIndex == page) {
                                         
                     NSMutableArray *itemPage = [self.pages objectAtIndex:page];
@@ -540,57 +552,58 @@ static const CGFloat iPadLandscapeYPadding = 30;
                         }
                     }
                 } 
+                // moving item to the next page
                 else if (currentPageIndex > page) {
-                    NSMutableArray *itemPage = [self.pages objectAtIndex:page];
-                    MyLauncherItem *itemToMove = [itemPage objectAtIndex:sindex];
+                    NSMutableArray *itemPage = [self.pages objectAtIndex:page];                 // current page
+                    MyLauncherItem *itemToMove = [itemPage objectAtIndex:sindex];               // grab current item
                     if ([self itemMovable:itemToMove]) {
-                        [itemPage removeObjectAtIndex:sindex];
-                        NSMutableArray *nextPage = [self.pages objectAtIndex:currentPageIndex];
-                        NSAssert(nextPage!=nil, @"Next Page must not be nil");
-
-                        if (dragIndex < [nextPage count]) {
-                            self.draggingItem.index = [NSNumber numberWithInt:dragIndex];
-                            self.draggingItem.page = [NSNumber numberWithInt:currentPageIndex];
-                            [nextPage insertObject:self.draggingItem atIndex:dragIndex];
-
-                            if ([nextPage count] > maxItemsPageCount) {
-                                NSMutableArray *uberNextPage = nil;
-
-                                if ([self.pages count] == currentPageIndex+1) {
-                                    uberNextPage = [self.pages objectAtIndex:currentPageIndex+1];
+                        [itemPage removeObjectAtIndex:sindex];                                  // remove it from current page
+                        NSMutableArray *nextPage = [self.pages objectAtIndex:currentPageIndex]; // get next page (*1: it gets created as soon as the edit mode begins)
+                        NSAssert(nextPage!=nil, @"Next Page must not be nil");              
+                        
+                        self.draggingItem.index = [NSNumber numberWithInt:dragIndex];       
+                        self.draggingItem.page = [NSNumber numberWithInt:currentPageIndex];
+                        
+                        
+                        // next page is full
+                        if ([nextPage count] == maxItemsPageCount) {
+                            BOOL _canDropItemOnPage = NO;
+                            int newPage = 0;
+                            NSMutableArray *uberNextPage = nil;
+                            
+                            
+                            while (!_canDropItemOnPage) {         
+                                // next but one page should exist already (see *1)
+                                if (currentPageIndex+1+newPage < [self.pages count]) { 
+                                    uberNextPage = [self.pages objectAtIndex:currentPageIndex+1+newPage];
+                                    nextPage = [self.pages objectAtIndex:currentPageIndex+newPage];
                                 }
-                                else {
-                                    uberNextPage = [NSMutableArray array];
-                                    [self.pages addObject:uberNextPage];
-                                    // TODO expand scrollView etc.
-                                    CGFloat newX = self.pagesScrollView.contentOffset.x + self.pagesScrollView.frame.size.width;
-                                    
-                                    NSInteger currentPageIndex = floor(newX/self.pagesScrollView.frame.size.width);
-                                    if(currentPageIndex + 1 > self.pages.count)
-                                    {
-                                        if(self.pages.count <= maxPageCount)
-                                        {
-                                            self.pageControl.numberOfPages = self.pages.count;
-                                        }
-                                    }
-                                    self.pageControl.currentPage = currentPageIndex;
-                                    
-                                    CGPoint offset = CGPointMake(newX, 0);
-                                    [self.pagesScrollView setContentOffset:offset]; 
-                                }
-                                MyLauncherItem *lastLauncherItemOnPage = [nextPage objectAtIndex:maxItemsPageCount-1];
-                                lastLauncherItemOnPage.page = [NSNumber numberWithInt:currentPageIndex+1];
-                                lastLauncherItemOnPage.index = [NSNumber numberWithInt:[uberNextPage count]];
-                                [nextPage removeObjectAtIndex:maxItemsPageCount-1];
+                                self.overFlowItem = [nextPage objectAtIndex:maxItemsPageCount-1];
+
+                                [self.overFlowItem setPage:[NSNumber numberWithInt:currentPageIndex+1+newPage]];
                                 if ([uberNextPage count] == 0) {
-                                    [uberNextPage addObject:lastLauncherItemOnPage];
+                                    [nextPage removeObjectAtIndex:maxItemsPageCount-1];
+                                    self.overFlowItem.index = [NSNumber numberWithInt:0];
+                                    [uberNextPage addObject:self.overFlowItem];
+                                    _canDropItemOnPage = YES;
                                 }
-                                else 
+                                else if ([uberNextPage count] >= maxItemsPageCount) {
+                                    _canDropItemOnPage = NO;
+                                    [self createNewPage];
+                                } 
+                                else
                                 {
-                                    [uberNextPage insertObject:lastLauncherItemOnPage atIndex:[uberNextPage count]];
+                                    [nextPage removeObjectAtIndex:maxItemsPageCount-1];
+                                    self.overFlowItem.index = [NSNumber numberWithInt:[uberNextPage count]];
+                                    [uberNextPage insertObject:self.overFlowItem atIndex:[uberNextPage count]];
+                                    _canDropItemOnPage = YES;
                                 }
+                                newPage++;
                             }
+                             [nextPage insertObject:self.draggingItem atIndex:dragIndex];
+                            
                         }
+                        // next page may have 0 elements or the item is being dragged to an empty area
                         else {
                             if ([nextPage count] == 0) {
                                 self.draggingItem.index = [NSNumber numberWithInt:0];
@@ -604,6 +617,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             [self.pages replaceObjectAtIndex:currentPageIndex withObject:nextPage];
                         }
                     }
+                    // moving item to previous page
                 } else if (currentPageIndex < page) {
                     NSMutableArray *itemPage = [self.pages objectAtIndex:page];
                     MyLauncherItem *itemToMove = [itemPage objectAtIndex:sindex];
@@ -616,10 +630,10 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             self.draggingItem.page = [NSNumber numberWithInt:currentPageIndex];
                             [previousPage insertObject:self.draggingItem atIndex:dragIndex];
                             if ([previousPage count] > maxItemsPageCount) {
-                                MyLauncherItem *lastLauncherItemOnPage = [previousPage objectAtIndex:maxItemsPageCount-1];
+                                MyLauncherItem *lastLauncherItemOnPage = [previousPage objectAtIndex:maxItemsPageCount];
                                 lastLauncherItemOnPage.page = [NSNumber numberWithInt:currentPageIndex+1];
                                 lastLauncherItemOnPage.index = [NSNumber numberWithInt:[itemPage count]];
-                                [previousPage removeObjectAtIndex:maxItemsPageCount-1];            
+                                [previousPage removeObjectAtIndex:maxItemsPageCount];            
                                 [itemPage insertObject:lastLauncherItemOnPage atIndex:[itemPage count]];
                             }
                         }
@@ -756,13 +770,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 	
 	editing = YES;
 	
-	if(self.pages.count <= maxPageCount)
-	{
-		[self.pages addObject:[NSMutableArray array]];
-		self.pageControl.numberOfPages = self.pages.count;
-		self.pagesScrollView.contentSize = CGSizeMake(self.pages.count*self.pagesScrollView.frame.size.width, 
-                                                      self.pagesScrollView.frame.size.height);
-	}
+	[self createNewPage];
     
 	[self animateItems];
 	[[self delegate] launcherViewDidBeginEditing:self];
