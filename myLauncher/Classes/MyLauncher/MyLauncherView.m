@@ -578,7 +578,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             
                             
                             while (!_canDropItemOnPage) {     
-                                NSLog(@"FINDME: %d", dragIndex);
                                 // next but one page should exist already (see *1)
                                 if (currentPageIndex+1+newPage < [self.pages count]) { 
                                     uberNextPage = [self.pages objectAtIndex:currentPageIndex+1+newPage];
@@ -1000,6 +999,15 @@ static const CGFloat iPadLandscapeYPadding = 30;
         [self.itemHoldTimer invalidate];
         self.itemHoldTimer = nil;
     }
+}
+
+#pragma mark --
+#pragma mark UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if (self.itemHoldTimer) {
+        [self.itemHoldTimer invalidate];
+        self.itemHoldTimer = nil;
+    }    
 }
 
 @end
