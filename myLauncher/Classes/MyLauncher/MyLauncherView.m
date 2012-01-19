@@ -548,7 +548,12 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             NSMutableArray *currentPage = [self.pages objectAtIndex:page];
                             
                             self.draggingItem.index = [NSNumber numberWithInt:dragIndex];   // here the index for LocatableItem is being updated
-                            [currentPage insertObject:self.draggingItem atIndex:dragIndex];                            
+                            [currentPage insertObject:self.draggingItem atIndex:dragIndex];    
+                            [UIView animateWithDuration:0.3 
+                                             animations:^{
+                                                 [self layoutItems]; 
+                                             }];
+
                         }
                     }
                 } 
@@ -572,7 +577,8 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             NSMutableArray *uberNextPage = nil;
                             
                             
-                            while (!_canDropItemOnPage) {         
+                            while (!_canDropItemOnPage) {     
+                                NSLog(@"FINDME: %d", dragIndex);
                                 // next but one page should exist already (see *1)
                                 if (currentPageIndex+1+newPage < [self.pages count]) { 
                                     uberNextPage = [self.pages objectAtIndex:currentPageIndex+1+newPage];
@@ -596,11 +602,24 @@ static const CGFloat iPadLandscapeYPadding = 30;
                                     [nextPage removeObjectAtIndex:maxItemsPageCount-1];
                                     self.overFlowItem.index = [NSNumber numberWithInt:[uberNextPage count]];
                                     [uberNextPage insertObject:self.overFlowItem atIndex:[uberNextPage count]];
+                                    [UIView animateWithDuration:0.3 
+                                                     animations:^{
+                                                         [self layoutItems]; 
+                                                     }];
+
                                     _canDropItemOnPage = YES;
                                 }
                                 newPage++;
                             }
-                             [nextPage insertObject:self.draggingItem atIndex:dragIndex];
+                            if (dragIndex < [nextPage count]) {
+                                [nextPage insertObject:self.draggingItem atIndex:dragIndex];   
+                                [UIView animateWithDuration:0.3 
+                                                 animations:^{
+                                                     [self layoutItems]; 
+                                                 }];
+
+                            }
+                             
                             
                         }
                         // next page may have 0 elements or the item is being dragged to an empty area
@@ -629,12 +648,22 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             self.draggingItem.index = [NSNumber numberWithInt:dragIndex];
                             self.draggingItem.page = [NSNumber numberWithInt:currentPageIndex];
                             [previousPage insertObject:self.draggingItem atIndex:dragIndex];
+                            [UIView animateWithDuration:0.3 
+                                             animations:^{
+                                                 [self layoutItems]; 
+                                             }];
+
                             if ([previousPage count] > maxItemsPageCount) {
                                 MyLauncherItem *lastLauncherItemOnPage = [previousPage objectAtIndex:maxItemsPageCount];
                                 lastLauncherItemOnPage.page = [NSNumber numberWithInt:currentPageIndex+1];
                                 lastLauncherItemOnPage.index = [NSNumber numberWithInt:[itemPage count]];
                                 [previousPage removeObjectAtIndex:maxItemsPageCount];            
                                 [itemPage insertObject:lastLauncherItemOnPage atIndex:[itemPage count]];
+                                [UIView animateWithDuration:0.3 
+                                                 animations:^{
+                                                     [self layoutItems]; 
+                                                 }];
+
                             }
                         }
                         else {
@@ -651,11 +680,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                         }
                     }
                 }
-                
-                [UIView animateWithDuration:0.3 
-                                 animations:^{
-                                     [self layoutItems]; 
-                                 }];
             }
             
 			//Moving Pages
