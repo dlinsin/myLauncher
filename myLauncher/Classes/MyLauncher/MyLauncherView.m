@@ -326,9 +326,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
         
 		for (MyLauncherItem *item in page)
 		{
-//            item.index = [NSNumber numberWithInt:itemIndex];
-//            item.page  = [NSNumber numberWithInt:pageIndex];
-            NSLog(@"FINDME: ITEM: %@ Page: %d Index: %d", item.title, [item.page intValue], [item.index intValue]);
 			if(itemsAdded) 
 			{
 				CGRect prevFrame = CGRectMake(x, y, itemWidth, itemHeight);
@@ -532,7 +529,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
                     NSMutableArray *itemPage = [self.pages objectAtIndex:page];
                     if (dragIndex < [itemPage count]) {
                         MyLauncherItem *itemToMove = [itemPage objectAtIndex:sindex];
-                        NSLog(@"FINDME: itemToMove: %@", itemToMove.title);
+                    
                         if ([self itemMovable:itemToMove]) {
                             [itemPage removeObjectAtIndex:sindex];
                             
@@ -908,7 +905,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
 		
 		for(MyLauncherItem *item in page)
 		{
-            NSLog(@"FINDME SAVE ITEM: %d", [item.page intValue]);
 			NSMutableDictionary *itemToSave = [[NSMutableDictionary alloc] init];
 			[itemToSave setObject:item.title forKey:@"title"];
 			[itemToSave setObject:item.image forKey:@"image"];

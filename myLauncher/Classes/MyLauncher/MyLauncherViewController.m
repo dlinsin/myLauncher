@@ -229,7 +229,6 @@
                                               deletable:[[item objectForKey:@"deletable"] boolValue] 
                                               page:[item objectForKey:@"itemPage"] 
                                               index:[item objectForKey:@"itemIndex"]]];
-                        NSLog(@"FINDME: After loading: %d", [[item objectForKey:@"itemPage"] intValue]);
                     }
                 } else {
                     [savedPage addObject:[[MyLauncherItem alloc]
