@@ -664,9 +664,9 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             if ([previousPage count] > maxItemsPageCount) {
                                 MyLauncherItem *lastLauncherItemOnPage = [previousPage objectAtIndex:maxItemsPageCount];
                                 lastLauncherItemOnPage.page = [NSNumber numberWithInt:currentPageIndex+1];
-                                lastLauncherItemOnPage.index = [NSNumber numberWithInt:[itemPage count]];
+                                lastLauncherItemOnPage.index = [NSNumber numberWithInt:0];
                                 [previousPage removeObjectAtIndex:maxItemsPageCount];            
-                                [itemPage insertObject:lastLauncherItemOnPage atIndex:[itemPage count]];
+                                [itemPage insertObject:lastLauncherItemOnPage atIndex:0];
                                 [UIView animateWithDuration:0.3 
                                                  animations:^{
                                                      [self layoutItems]; 
