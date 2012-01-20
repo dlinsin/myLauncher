@@ -33,6 +33,10 @@
 - (void)startConfigOnPage:(NSNumber *)pageNumber;
 @end
 
+@protocol MyLauncherRuntimeDelegate <NSObject>
+- (void)myLauncherChangedToPage:(int)pageNumber;
+@end
+
 @interface MyLauncherView : UIView <UIScrollViewDelegate, MyLauncherItemDelegate> {	
     UIDeviceOrientation currentOrientation;
 	BOOL itemsAdded;
@@ -58,12 +62,15 @@
 @property (nonatomic, strong) MyLauncherPageControl *pageControl;
 @property (nonatomic, strong) NSMutableArray *pages;
 @property (nonatomic, assign) id<MyLauncherConfigDelegate> configDelegate;
+@property (nonatomic, assign) id<MyLauncherRuntimeDelegate> runtimeDelegate;
 
 // Default for animation below is YES
 
 -(void)setPages:(NSMutableArray *)pages animated:(BOOL)animated;
 -(void)setPages:(NSMutableArray *)pages numberOfImmovableItems:(NSInteger)items;
 -(void)setPages:(NSMutableArray *)pages numberOfImmovableItems:(NSInteger)items animated:(BOOL)animated;
+
+-(void)showPage:(int)pageNumber;
 
 -(void)viewDidAppear:(BOOL)animated;
 -(void)setCurrentOrientation:(UIInterfaceOrientation)newOrientation;

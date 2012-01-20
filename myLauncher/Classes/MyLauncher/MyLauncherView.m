@@ -102,6 +102,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 @synthesize draggingItem = _draggingItem;
 @synthesize overFlowItem = _overFlowItem;
 @synthesize configDelegate;
+@synthesize runtimeDelegate;
 
 
 #pragma mark - View lifecycle
@@ -183,6 +184,13 @@ static const CGFloat iPadLandscapeYPadding = 30;
     [self setNumberOfImmovableItems:items];
 }
 
+-(void)showPage:(int)pageNumber {
+    CGFloat x = pageNumber * self.pagesScrollView.frame.size.width;
+    CGPoint offset = CGPointMake(x, 0);
+    [self.pagesScrollView setContentOffset:offset];   
+    self.pageControl.currentPage = pageNumber;
+}
+
 #pragma mark - PageInfo
 - (NSNumber *)currentPage {
     float pageWidth = self.pagesScrollView.frame.size.width;
@@ -219,7 +227,8 @@ static const CGFloat iPadLandscapeYPadding = 30;
 {
 	self.pageControl.currentPage = floor((self.pagesScrollView.contentOffset.x - self.pagesScrollView.frame.size.width / 2) / 
                                          self.pagesScrollView.frame.size.width) + 1;
-    
+
+    [self.runtimeDelegate myLauncherChangedToPage:[[self currentPage] intValue]];
 }
 
 - (void)updateFrames
@@ -972,7 +981,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
 
 - (void)itemHoldTimerConfig {
     self.itemHoldTimer = nil;
-    [self.configDelegate startConfigOnPage:[self currentPage]];
+    [self.configDelegate startConfigOnPage:[NSNumber numberWithInteger:self.pageControl.currentPage]];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
