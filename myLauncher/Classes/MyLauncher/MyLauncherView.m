@@ -760,6 +760,8 @@ static const CGFloat iPadLandscapeYPadding = 30;
                                                  self.draggingItem.frame.size.width, 
                                                  self.draggingItem.frame.size.height);
         }];	
+        [self.runtimeDelegate myLauncherChangedToPage:[[self currentPage] intValue]];
+        
 	}
 	else if([(NSString*)timer.userInfo isEqualToString:@"left"])
 	{
@@ -774,6 +776,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
                                                  self.draggingItem.frame.size.width, 
                                                  self.draggingItem.frame.size.height);
         }];
+        [self.runtimeDelegate myLauncherChangedToPage:[[self currentPage] intValue]];
 	}
 }
 
