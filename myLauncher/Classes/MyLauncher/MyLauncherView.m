@@ -71,9 +71,8 @@ static const CGFloat iPadLandscapeItemYStart = 30;
 static const CGFloat iPadLandscapeXPadding = 80;
 static const CGFloat iPadLandscapeYPadding = 30;
 
-@interface MyLauncherView () {
-    BOOL _addedToFullPreviousPage;
-}
+@interface MyLauncherView () 
+
 -(void)setupCurrentViewLayoutSettings;
 -(void)layoutItems;
 -(void)beginEditing;
@@ -342,10 +341,11 @@ static const CGFloat iPadLandscapeYPadding = 30;
 		{
 			if(itemsAdded) 
 			{
-                if (_addedToFullPreviousPage) {
+                dispatch_queue_t renewIndices = dispatch_queue_create("Renew Indices", NULL);
+                dispatch_async(renewIndices, ^{
                     item.index = [NSNumber numberWithInt:itemIndex];
                     item.page = [NSNumber numberWithInt:pageIndex];
-                }
+                });
 
 				CGRect prevFrame = CGRectMake(x, y, itemWidth, itemHeight);
                 
@@ -565,7 +565,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             
                             self.draggingItem.index = [NSNumber numberWithInt:dragIndex];   // here the index for LocatableItem is being updated
                             [currentPage insertObject:self.draggingItem atIndex:dragIndex];    
-                            _addedToFullPreviousPage = NO;
                             [UIView animateWithDuration:0.3 
                                              animations:^{
                                                  [self layoutItems]; 
@@ -618,7 +617,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                                     [nextPage removeObjectAtIndex:maxItemsPageCount-1];
                                     self.overFlowItem.index = [NSNumber numberWithInt:[uberNextPage count]];
                                     [uberNextPage insertObject:self.overFlowItem atIndex:[uberNextPage count]];
-                                    _addedToFullPreviousPage = NO;
                                     [UIView animateWithDuration:0.3 
                                                      animations:^{
                                                          [self layoutItems]; 
@@ -630,7 +628,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             }
                             if (dragIndex < [nextPage count]) {
                                 [nextPage insertObject:self.draggingItem atIndex:dragIndex];   
-                                _addedToFullPreviousPage = NO;
                                 [UIView animateWithDuration:0.3 
                                                  animations:^{
                                                      [self layoutItems]; 
@@ -666,7 +663,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                             self.draggingItem.index = [NSNumber numberWithInt:dragIndex];
                             self.draggingItem.page = [NSNumber numberWithInt:currentPageIndex];
                             [previousPage insertObject:self.draggingItem atIndex:dragIndex];
-                            _addedToFullPreviousPage = NO;
                             [UIView animateWithDuration:0.3 
                                              animations:^{
                                                  [self layoutItems]; 
@@ -678,7 +674,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
                                 lastLauncherItemOnPage.index = [NSNumber numberWithInt:0];
                                 [previousPage removeObjectAtIndex:maxItemsPageCount];            
                                 [itemPage insertObject:lastLauncherItemOnPage atIndex:0];
-                                _addedToFullPreviousPage = YES;
                                 [UIView animateWithDuration:0.3 
                                                  animations:^{
                                                      [self layoutItems]; 
