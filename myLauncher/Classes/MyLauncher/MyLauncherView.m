@@ -258,18 +258,9 @@ static const CGFloat iPadLandscapeYPadding = 30;
     return maxPageCount;
 }
 
+// we'll ignore the device orientation and set the layout attributes always so, as if the device is in portrait mode.
 -(void)setupCurrentViewLayoutSettings {    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if (UIDeviceOrientationIsLandscape([self currentLayoutOrientation])) {
-            minX = iPadLandscapeItemXStart;
-            minY = iPadLandscapeItemYStart;
-            paddingX = iPadLandscapeXPadding;
-            paddingY = iPadLandscapeYPadding;
-            columnCount = iPadLandscapeColumnCount;
-            rowCount = iPadLandscapeRowCount;
-            itemWidth = iPadLandscapeItemWidth;
-            itemHeight = iPadLandscapeItemHeight;
-        } else {
             minX = iPadPortraitItemXStart;
             minY = iPadPortraitItemYStart;
             paddingX = iPadPortraitXPadding;
@@ -278,20 +269,7 @@ static const CGFloat iPadLandscapeYPadding = 30;
             rowCount = iPadPortraitRowCount;
             itemWidth = iPadPortraitItemWidth;
             itemHeight = iPadPortraitItemHeight;
-        }
-        
     } else {
-        if (UIDeviceOrientationIsLandscape([self currentLayoutOrientation]))
-        {
-            minX = landscapeItemXStart;
-            minY = landscapeItemYStart;
-            paddingX = landscapeXPadding;
-            paddingY = landscapeYPadding;
-            columnCount = landscapeColumnCount;
-            rowCount = landscapeRowCount;
-            itemWidth = landscapeItemWidth;
-            itemHeight = landscapeItemHeight;
-        } else {
             minX = portraitItemXStart;
             minY = portraitItemYStart;
             paddingX = portraitXPadding;
@@ -300,7 +278,6 @@ static const CGFloat iPadLandscapeYPadding = 30;
             rowCount = portraitRowCount;
             itemWidth = portraitItemWidth;
             itemHeight = portraitItemHeight;
-        }
     }
 }
 
