@@ -290,10 +290,11 @@ static const CGFloat iPadLandscapeYPadding = 30;
 -(void)layoutLauncherAnimated:(BOOL)animated
 {
     [self updateFrames];
-    
+
+    __block __typeof__(self) blockself = self;
     [UIView animateWithDuration:animated ? 0.3 : 0
                      animations:^{
-                         [self layoutItems];
+                         [blockself layoutItems];
                      }];
     
 	[self pageChanged];
@@ -397,9 +398,10 @@ static const CGFloat iPadLandscapeYPadding = 30;
 		[self.draggingItem setDragging:NO];
 		self.draggingItem = nil;
 		self.pagesScrollView.scrollEnabled = YES;
+        __block __typeof__(self) blockself = self;
 		[UIView animateWithDuration:0.3 
                          animations:^{
-                             [self layoutItems]; 
+                             [blockself layoutItems];
                          }];
 	}
 	else 
@@ -423,9 +425,10 @@ static const CGFloat iPadLandscapeYPadding = 30;
 	[self.draggingItem setDragging:NO];
 	self.draggingItem = nil;
 	self.pagesScrollView.scrollEnabled = YES;
+    __block __typeof__(self) blockself = self;
 	[UIView animateWithDuration:0.3 
                      animations:^{
-                         [self layoutItems]; 
+                         [blockself layoutItems];
                      }];
 }
 
@@ -529,9 +532,10 @@ static const CGFloat iPadLandscapeYPadding = 30;
                         {
                             [currentPage insertObject:self.draggingItem atIndex:dragIndex];
                             [self organizePages];
+                            __block __typeof__(self) blockself = self;
                             [UIView animateWithDuration:0.3 
                                              animations:^{
-                                                 [self layoutItems]; 
+                                                 [blockself layoutItems];
                                              }];
                         }
                     }
@@ -752,9 +756,10 @@ static const CGFloat iPadLandscapeYPadding = 30;
                 if (i < numberOfImmovableItems)
                     numberOfImmovableItems--;
 				[page removeObjectAtIndex:i];
+                __block __typeof__(self) blockself = self;
                 [UIView animateWithDuration:0.3 
                                  animations:^{
-                                     [self layoutItems]; 
+                                     [blockself layoutItems];
                                  }];
 				return;
 			}
